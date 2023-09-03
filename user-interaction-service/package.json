@@ -1,0 +1,22 @@
+{
+  "name": "user-interaction",
+  "version": "1.0.0",
+  "description": "User Interaction service is basically supposed to record events done by the user.",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.5.0",
+    "express": "^4.18.2",
+    "mongodb": "^6.0.0",
+    "mongoose": "^7.5.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "dotenv": "^16.3.1",
+    "nodemon": "^3.0.1"
+  }
+}
