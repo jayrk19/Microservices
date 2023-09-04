@@ -21,4 +21,5 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.index({ userId: 1, contentId: 1}, { unique: true });
 module.exports = mongoose.model("UserInteraction", userSchema);
