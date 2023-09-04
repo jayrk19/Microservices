@@ -6,7 +6,6 @@ const NewContents = require("./routes/newContents");
 const TopContents = require("./routes/topContents");
 
 require("dotenv").config();
-const PORT = 3000;
 
 const app = express();
 app.use(express.json());
@@ -22,6 +21,6 @@ app.use("/ingest", Ingest);
 app.use("/newContents", NewContents);
 app.use("/topContents", TopContents);
 
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
+app.listen(process.env.CONTENT_SERVICE_PORT, () =>
+  console.log(`Server running on http://${process.env.CONTENT_SERVICE_DOMAIN}:${process.env.CONTENT_SERVICE_PORT}`)
 );

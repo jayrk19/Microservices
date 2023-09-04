@@ -2,11 +2,12 @@ const express = require("express");
 const router = express.Router();
 const UserInteraction = require("../models/userInteraction");
 const axios = require("axios");
+require('dotenv').config()
 
 const validateRequest = async (userInteraction) => {
   let isValid;
   await axios
-    .get(`http://localhost:3002/users/${userInteraction.userId}`)
+    .get(`http://${process.env.USER_SERVICE_DOMAIN}:${process.env.USER_SERVICE_PORT}/users/${userInteraction.userId}`)
     .then(() => {
       isValid = true;
     })
@@ -16,7 +17,7 @@ const validateRequest = async (userInteraction) => {
   if (isValid === false) return false;
 
   await axios
-    .get(`http://localhost:3000/contents/${userInteraction.contentId}`)
+    .get(`http://${process.env.CONTENT_SERVICE_DOMAIN}:${process.env.CONTENT_SERVICE_PORT}/contents/${userInteraction.contentId}`)
     .then(() => {
       isValid = true;
     })
@@ -28,13 +29,13 @@ const validateRequest = async (userInteraction) => {
 };
 
 const readContentService = async (contentId) => {
-  await axios.patch(`http://localhost:3000/contents/${contentId}/read`);
+  await axios.patch(`http://${process.env.CONTENT_SERVICE_DOMAIN}:${process.env.CONTENT_SERVICE_PORT}/contents/${contentId}/read`);
 };
 const likeContentService = async (contentId) => {
-  await axios.patch(`http://localhost:3000/contents/${contentId}/like`);
+  await axios.patch(`http://${process.env.CONTENT_SERVICE_DOMAIN}:${process.env.CONTENT_SERVICE_PORT}/contents/${contentId}/like`);
 };
 const unlikeContentService = async (contentId) => {
-  await axios.patch(`http://localhost:3000/contents/${contentId}/unlike`);
+  await axios.patch(`http://${process.env.CONTENT_SERVICE_DOMAIN}:${process.env.CONTENT_SERVICE_PORT}/contents/${contentId}/unlike`);
 };
 
 router.get("/", async (req, res) => {
@@ -71,18 +72,6 @@ router.post("/", async (req, res) => {
     let isValid = await validateRequest(userInteraction);
     if (isValid === false) {
       return res.status(400).json({ message: "Invalid user/content provided" });
-    }
-    const existingUserInteraction = await UserInteraction.find({
-      userId: userInteraction.userId,
-      contentId: userInteraction.contentId,
-    });
-    if (existingUserInteraction.length !== 0) {
-      return res
-        .status(400)
-        .send(
-          "Userinteraction already exists with given id " +
-            existingUserInteraction[0]._id
-        );
     }
     await readContentService(userInteraction.contentId);
     if (userInteraction.like === true)

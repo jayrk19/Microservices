@@ -2,6 +2,20 @@ const express = require("express");
 const router = express.Router();
 const Content = require("../models/content");
 
+const validateUserId = async (userId) => {
+  let isValid;
+  await axios
+    .get(`http://${process.env.USER_SERVICE_DOMAIN}:${process.env.USER_SERVICE_PORT}/users/${userId}`)
+    .then(() => {
+      isValid = true;
+    })
+    .catch(() => {
+      isValid = false;
+    });
+
+  return isValid;
+};
+
 router.get("/", async (req, res) => {
   try {
     const contents = await Content.find();
@@ -16,7 +30,7 @@ router.get("/:id", async (req, res) => {
     const content = await Content.findById(req.params.id);
     if (content == null) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "No content found with the given id" });
     }
     res.status(200).json(content);
@@ -36,10 +50,12 @@ router.post("/", async (req, res) => {
       title: content.title,
       userId: content.userId,
     });
-    if (existingContent.length != 0) {
-      return res.status(400).json({
+    const isUserIdValid = await validateUserId(content.userId);
+    if(isUserIdValid === false){
+      return res.status(400)
+      .json({
         message:
-          "Content already exists with content id " + existingContent[0]._id,
+          "UserId provided does not exist " + content.userId
       });
     }
     const newContent = await content.save();
@@ -53,7 +69,7 @@ router.patch("/:id", async (req, res) => {
   try {
     const content = await Content.findById(req.params.id);
     if (content == null) {
-      return res.status(400).send("No content found with id " + req.params.id);
+      return res.status(404).send("No content found with id " + req.params.id);
     }
     if (req.body.title != null) content.title = req.body.title;
     if (req.body.story != null) content.story = req.body.story;
@@ -68,7 +84,7 @@ router.patch("/:id/read", async (req, res) => {
   try {
     const content = await Content.findById(req.params.id);
     if (content == null) {
-      return res.status(400).send("No content found with id " + req.params.id);
+      return res.status(404).send("No content found with id " + req.params.id);
     }
     content.read++;
     const newContent = await content.save();
@@ -81,7 +97,7 @@ router.patch("/:id/like", async (req, res) => {
   try {
     const content = await Content.findById(req.params.id);
     if (content === null) {
-      return res.status(400).send("No content found with id " + req.params.id);
+      return res.status(404).send("No content found with id " + req.params.id);
     }
     content.like++;
     const newContent = await content.save();
@@ -94,7 +110,7 @@ router.patch("/:id/unlike", async (req, res) => {
   try {
     const content = await Content.findById(req.params.id);
     if (content == null) {
-      return res.status(400).send("No content found with id " + req.params.id);
+      return res.status(404).send("No content found with id " + req.params.id);
     }
     if (content.like == 0) {
       return res
@@ -113,7 +129,7 @@ router.delete("/:id", async (req, res) => {
   try {
     const content = await Content.findById(req.params.id);
     if (content == null) {
-      return res.status(400).send("No content found with id " + req.params.id);
+      return res.status(404).send("No content found with id " + req.params.id);
     }
 
     await content.deleteOne();

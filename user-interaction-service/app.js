@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const UserInteraction = require("./routes/userInteractions");
 
 require("dotenv").config();
-const PORT = 3001;
 
 const app = express();
 app.use(express.json());
@@ -16,6 +15,6 @@ db.once("open", () => console.log("Connected to database"));
 
 app.use("/userInteractions", UserInteraction);
 
-app.listen(PORT, () =>
-  console.log(`Server running on http://localhost:${PORT}`)
+app.listen(process.env.USER_INTERACTION_SERVICE_PORT, () =>
+  console.log(`Server running on http://${process.env.USER_INTERACTION_SERVICE_DOMAIN}:${process.env.USER_INTERACTION_SERVICE_PORT}`)
 );

@@ -30,4 +30,6 @@ const contentSchema = new mongoose.Schema({
   },
 });
 
+contentSchema.index({ title: 1, userId: 1}, { unique: true });
+
 module.exports = mongoose.model("Content", contentSchema);
