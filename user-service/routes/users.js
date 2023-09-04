@@ -16,7 +16,7 @@ router.get("/:id", async (req, res) => {
     const user = await User.findById(req.params.id);
     if (user == null) {
       return res
-        .status(400)
+        .status(404)
         .json({ message: "No user found with the given id" });
     }
     res.status(200).json(user);
@@ -44,7 +44,7 @@ router.patch("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (user == null) {
-      return res.status(400).send("No user found with id " + req.params.id);
+      return res.status(404).send("No user found with id " + req.params.id);
     }
     if (req.body.firstName != null) user.firstName = req.body.firstName;
     if (req.body.lastName != null) user.lastName = req.body.lastName;
@@ -62,11 +62,9 @@ router.delete("/:id", async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (user == null) {
-      return res.status(400).send("No user found with id " + req.params.id);
+      return res.status(404).send("No user found with id " + req.params.id);
     }
-
     await user.deleteOne();
-
     res.status(200).json({ message: "Successfully removed" });
   } catch (error) {
     res.status(500).json({ message: error.message });
